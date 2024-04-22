@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<head>
+	<title>Projet Webscraping</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/code.css">
+</head>
+<body>
+    <header>
+        <h1>Projet Web Scraping</h1>
+    </header>
+
+    <section id="introduction">
+        <h2>Introduction</h2>
+        <p>Ce projet vise à collecter des données sur le site web d'Action. L'objectif est d'extraire des informations sur les produits disponibles afin de les analyser ou de les utiliser à d'autres fins.</p>
+    </section>
+
+   <section id="processus">
+		<h2>Étapes du projet :</h2>
+
+		<section id="exploration">
+			<h3>Exploration du site pour comprendre l'architecture et les requêtes API</h3>
+			<p>Cette partie correspond à l'exploration du site web Action pour comprendre sa structure et les requêtes API nécessaires pour extraire les données des produits.</p>
+		</section>
+
+		<section id="authentification">
+			<h3>Récupération du jeton d'authentification pour requêter l'API</h3>
+			<p>Cette partie du code récupère le jeton d'authentification nécessaire pour accéder à l'API.</p>
+			<pre class="code-block"><code># Fonction pour extraire le token à partir de l'URL
+def get_token(url: str) -> str:
+    # Envoi de la requête HTTP GET à l'URL spécifiée
+    response = rq.get(url, headers=user_agent)
+    
+    # Extraction du contenu HTML de la réponse
+    html_code = response.text
+    
+    # Analyse du code HTML avec BeautifulSoup
+    soup = BeautifulSoup(html_code, 'html.parser')
+    
+    # Recherche du tag meta avec l'attribut name égal à 'build-id'
+    meta_tag = soup.find('meta', {'name': 'build-id'})
+    
+    # Extraction du contenu de l'attribut 'content' de l'élément trouvé
+    build_id = meta_tag['content']
+    
+    # Retour du jeton extrait
+    return build_id </code></pre>
+		</section>
+
+		<section id="collecte">
+			<h3>Collecte des informations des produits</h3>
+			<p>Cette partie du code collecte les informations de chaque produit (boucle sur les produits) de chaque page (boucle sur les pages) de chaque catégorie (boucle sur les catégories).</p>
+			<pre class="code-block"><code> # Liste des catégories de produits
+categories = ['habitat', 'cuisine', 'articles-menagers', 'papeterie--bureau', 'hobby', 'bricolage', 'jouets', 'jardin', 'voyages', 'hygiene--beaute', 'boissons--alimentation', 'multimedia', 'mode', 'articles-de-sport', 'animaux-domestiques']
+
+# Boucle sur chaque catégorie
+for categorie in categories:
+    
+    print(f'categorie : {categorie}')  # Affichage de la catégorie en cours
+    
+    # Boucle sur chaque page jusqu'à un certain nombre arbitraire (2000 dans ce cas)
+    for page in range(1, 2000):
+        
+        # Paramètres de la requête pour obtenir les données JSON de la page
+        payload: Dict[str, Union[str, List[str]]] = {'locale': 'fr-fr', 'path': ['c', categorie], 'page': page}
+        
+        print(f'page {page}')  # Affichage du numéro de page
+        
+        # Requête pour obtenir les données JSON de la page actuelle
+        response = rq.get(f'https://www.action.com/_next/data/{get_token(url_base)}/fr-fr/c/{categorie}.json', params=payload, headers=user_agent)
+        page_response_dict: Dict[str, List[Dict[str, str]]] = response.json()
+        page_props_dict: Dict[str, Dict[str, List[Dict[str, Optional[str]]]]] = page_response_dict["pageProps"]
+        
+        #Si la clé n'est pas trouvée, cela indique que la catégorie n'a plus de produits à récupérer.
+        try:
+            initial_state_dict: Dict[str, List[Dict[str, Optional[str]]]] = page_props_dict["initialState"]
+        except KeyError:
+            break  # Sortir de la boucle si la catégorie n'a plus de produits à récupérer
+        
+        # Récupération de la liste des produits sur la page actuelle
+        product_list: List[str] = [key for key in initial_state_dict if key.startswith("Product:")]
+        info_product_list: List[Dict[str, Optional[str]]] = [initial_state_dict.get(product_dict) for product_dict in product_list]
+        url_product: List[Optional[str]] = [info["href"] for info in info_product_list]
+        id_product: List[Optional[str]] = [info["id"] for info in info_product_list]
+
+        # Boucle sur chaque produit de la page
+        for url_product, id_product in zip(url_product, id_product):
+            
+            # Extraction du nom du produit à partir de l'URL
+            code_name = url_product.replace(url_base, "")
+            code_name = code_name.replace("p/", "")
+            code_name = code_name.split("/")
+            code_name = code_name[:2]
+            
+            # Requête pour obtenir les détails du produit
+            response_product = rq.get(f'https://www.action.com/_next/data/{get_token(url_base)}/fr-fr/p/{code_name[0]}/{code_name[1]}.json', params=payload, headers=user_agent)
+            response_product_json: Dict[str, Dict[str, List[Dict[str, Optional[Union[str, int, float, bool]]]]]] = response_product.json()
+            page_props_dict2: Dict[str, Dict[str, List[Dict[str, Optional[Union[str, int, float, bool]]]]]] = response_product_json["pageProps"]
+
+            # Si le produit a été redirigé, attendre avant de continuer
+            if page_props_dict2.get("__N_REDIRECT_STATUS") is not None:
+                time.sleep(10)
+                continue
+
+            # Récupération des détails du produit
+            initial_state_dict2: Dict[str, Optional[Union[str, int, float, bool]]] = page_props_dict2["initialState"]
+            product: Dict[str, Optional[Union[str, int, float, bool]]] = initial_state_dict2[f'Product:{id_product}']</code></pre>
+		</section>
+
+		<section id="fichiers">
+			<h3>Création d'un fichier JSON pour chaque produit</h3>
+			<p>Cette partie du code écrit les informations de chaque produit (toujours dans la boucle sur les produits) dans un fichier JSON qu'on nomme par le nom du produit et qu'on met dans un dossier.</p>
+			<pre class="code-block"><code> # Écriture des détails du produit dans un fichier JSON
+            dossier = "Z:/webscraping/TP/dossier_produits"  # Chemin du dossier où seront enregistrés les fichiers JSON
+            os.makedirs(dossier, exist_ok=True)  # Création du dossier s'il n'existe pas
+            file_product = os.path.join(dossier, f'{code_name[1]}.json')  # Chemin du fichier JSON du produit
+            json_data = json.dumps(product)  # Conversion des données du produit en JSON
+            with open(file_product, "w") as json_file:
+                json_file.write(json_data)  # Écriture des données JSON dans le fichier</code></pre>
+		</section>
+		
+		<section id="dataframe">
+			<h3>Conversion des fichiers JSON en DataFrame pour faire des analyses.</h3>
+			<p>Ce code est dans un autre fichier et convertit les fichiers JSON en DataFrame Pandas pour pouvoir les utiliser.</p>
+			<pre class="code-block"><code># Fonction pour convertir un fichier JSON en DataFrame Pandas
+def json_to_dataframe(file_path):
+    with open(file_path, 'r') as f:
+        data = json.load(f)
+    df = pd.json_normalize(data)  # Normalisation des données JSON en DataFrame
+    return df
+
+# Chemin du dossier contenant les fichiers JSON
+dossier_produits = "Z:/webscraping/TP/dossier_produits"
+
+# Liste de tous les fichiers JSON dans le dossier spécifié
+fichiers_json = glob.glob(f"{dossier_produits}/*.json")
+
+# DataFrame combiné pour stocker toutes les données JSON
+combined_df = pd.DataFrame()
+
+# Boucle sur chaque fichier JSON et conversion en DataFrame, puis concaténation
+for fichier in fichiers_json:
+    df = json_to_dataframe(fichier)  # Conversion du fichier JSON en DataFrame
+    combined_df = pd.concat([combined_df, df], ignore_index=True)  # Concaténation avec le DataFrame combiné</code></pre>
+		</section>
+
+		<section id="explications">
+			<h2>Explications du Code</h2>
+			<p>On commence par importer les bibliothèques nécessaires, telles que Requests pour envoyer des requêtes HTTP et BeautifulSoup pour analyser le HTML.</p>
+			<p>Le code récupère ensuite le jeton d'authentification à partir de l'URL du site, puis boucle sur chaque catégorie de produits pour extraire les informations des produits.</p>
+			<p>Les informations extraites sont ensuite écrites dans des fichiers JSON dans un dossier spécifié.</p>
+			<p>Enfin, sur un second code Python, les fichiers JSON sont convertis en DataFrame Pandas pour permettre de faire des analyses dessus.</p>
+		</section>
+	</section>
+	<p><a href="document/webscraping.pdf" target="_blank">lien vers la fiche bilan SAE</a></p>
+    <footer>
+        <p>Ce projet de web scraping est destiné à des fins éducatives et démontre l'utilisation de Python pour collecter des données à partir du web.<br>Pour diverses raisons le code n'est plus fonctionnel.</p>
+    </footer>
+</body>
+</html>

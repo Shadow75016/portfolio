@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<head>
+    <title>Inégalités homme/femme</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/code.css">
+</head>
+<body>
+    <header>
+        <h1>Projet sur les Inégalités homme/femme</h1>
+    </header>
+
+    <section id="introduction">
+        <h2>Introduction</h2>
+        <p>Ce projet a pour objectif de mettre en avant les inégalités homme/femme selon la période de la vie, mon groupe avait la période adulte.<br>C'est un projet de groupe et je me suis occupé principalement du développement de l'application R shiny.</p>
+    </section>
+
+   <section id="processus">
+		<h2>Étapes du projet :</h2>
+
+		<section id="recherche">
+			<h3>Recherche de bases de données pertinentes</h3>
+			<p>Cette partie correspond à la recherche des données, nous avons finalement pris des données de l'INSEE sur les salaires net horaire en fonction du genre, de l'âge, la catégorie professionnelle et différentes zones géographiques, le tout allant de 2012 à 2021.</p>
+		</section>
+
+		<section id="excel">
+			<h3>Analyse des données sur Excel</h3>
+			<p>Une fois les données trouvées, nous les avons ouvertes sur Excel pour voir comment elles étaient organisées et pour décider des données que nous allons garder.<br>On a décidé de conserver uniquement les données du genre, la catégorie professionnelle et le département.</p>
+		</section>
+
+		<section id="nettoyage">
+			<h3>Nettoyage et préparation des données sur R</h3>
+			<p>Ensuite, nous avons importé les bases de données sur R pour les nettoyer et garder uniquement les données qu'on voulait.<br>Puis nous les avons préparées pour les analyses qu'on voulait faire, des estimations et un ratio sur les salaires en fonction de la catégorie professionnelle.<br>Nous avons remarqué qu'il y avait des données manquantes pour l'année 2016 donc nous les avons estimer avec un modèle polynomial.</p>
+		</section>
+
+		<section id="analyse">
+			<h3>Analyses des données sur R</h3>
+			<p>Maintenant, qu'on a préparé les données, nous avons fait les analyses souhaitées donc les estimations avec un modèle linéaire et le ratio de salaire homme/femme selon la catégorie professionnelle.</p>
+		</section>
+		
+		<section id="shiny">
+			<h3>Développement d'une application R Shiny avec une carte interactive</h3>
+			<p>Après avoir fait les analyses, j'ai récupéré les fichiers pour faire une application R shiny, composée d'une description du projet, des rôles des membres du groupe et des données ainsi que d'une carte interactive.<br>Cette carte affichait le ratio des salaires homme/femme selon l'année et la catégorie professionnelle, on pouvait changer ces deux variables via 2 sélecteurs.<br>Pour faire la carte, j'ai dû chercher les données géographiques de chaque département pour les afficher sur la carte.</p>
+		</section>
+
+
+		<section id="explications">
+			<h2>Explications du Code</h2>
+			<p>On commence par charger les packages nécessaires ensuite, on importe les fichiers avec quelques préparations finales pour l'application.</p>
+			<pre class="code-block"><code># Charger les packages nécessaires
+	library(shiny)          # Pour créer des applications web interactives
+	library(dplyr)          # Pour manipuler les données
+	library(leaflet)        # Pour la création de cartes interactives
+	library(shinydashboard) # Pour créer un tableau de bord Shiny
+	library(DT)             # Pour afficher des tableaux de données interactifs
+	library(tidyverse)      # Pour une manipulation de données efficace
+	library(sf)             # Pour manipuler des données géographiques
+
+	# Définir le répertoire de travail comme le dossier contenant les fichiers .RData
+	dossier_base <- getwd()
+
+	# Liste des noms de fichiers sans extension (de "2012" à "2040")
+	noms_fichiers <- as.character(2012:2040)
+
+	# Définir la fonction d'importation des fichiers
+	importer_fichier <- function(nom_fichier) {
+	  chemin_fichier <- file.path(dossier_base, paste0(nom_fichier, ".RData"))
+	  load(chemin_fichier)
+	  return(test)
+	}
+
+	# Importer tous les fichiers et les stocker dans une liste
+	donnees <- lapply(noms_fichiers, importer_fichier)
+	names(donnees) <- noms_fichiers
+
+	# Supprimer les 4 dernières lignes de chaque fichier
+	donnees <- lapply(donnees, function(data) {
+	  data <- head(data, -4)
+	})
+
+	# Variables disponibles dans le menu déroulant
+	variables <- c("SNHMHr", "SNHMHCr", "SNHMHPr", "SNHMHEr", "SNHMHOr")
+
+	# Définir les données géographiques des départements français (latitude et longitude)
+	geo_data <- st_read("geo2/geo2.shp")
+
+	# Liste des noms des départements d'outre-mer
+	dom_names <- c("Guadeloupe", "Martinique", "Guyane", "La Réunion", "Mayotte", "Saint-Pierre-et-Miquelon", 
+				   "Saint-Barthélemy", "Saint-Martin")
+
+	# Filtrer les données pour exclure les DOM
+	geo_data <- geo_data[!geo_data$nom %in% dom_names, ] </code></pre>
+
+			<p>Ensuite on défini l'interface utilisateur, c'est ce que verra l'utilisateur en lançant l'application, c'est dans cette partie qu'on organise l'affichage donc la taille, l'ordre et le type d'élément qui seront affichés.</p>
+			<pre class="code-block"><code># Définition de l'interface utilisateur
+	ui <- dashboardPage(
+	  dashboardHeader(title = "Différence de salaire net horaire des hommes par rapport aux femmes"), # Titre du tableau de bord
+	  dashboardSidebar(
+		sidebarMenu(
+		  menuItem("Présentation", tabName = "Présentation", icon = icon("info-circle")), # Onglet "Présentation"
+		  menuItem("Carte", tabName = "carte", icon = icon("map")) # Onglet "Carte"
+		)
+	  ),
+	  dashboardBody(
+		tags$head(
+		  tags$link(rel = "stylesheet", href = "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css") # Lien vers une feuille de style Bootstrap
+		),
+		tags$style(
+		  # Définir le style personnalisé pour la carte
+		  HTML(".leaflet-container {flex: 1 1 auto !important;}") # Style CSS pour la carte Leaflet
+		),
+		tabItems(
+		  tabItem(tabName = "carte", # Contenu de l'onglet "Carte"
+				  fluidRow(
+					column(12,
+						   infoBox(title = "Département avec la valeur minimale",
+								   value = textOutput("min_department"),
+								   subtitle = textOutput("min_value"),
+								   icon = icon('thumbs-up'),
+								   fill = TRUE,
+								   color = "green"), # Boîte d'information pour la valeur minimale
+						   infoBox(title = "Département avec la valeur maximale",
+								   value = textOutput("max_department"),
+								   subtitle = textOutput("max_value"),
+								   icon = icon('thumbs-down'),
+								   fill = TRUE,
+								   color = "orange") # Boîte d'information pour la valeur maximale
+					),
+					column(12,
+						   box(title = "Carte", # Boîte pour afficher la carte
+							   status = "primary",
+							   solidHeader = TRUE,
+							   leafletOutput("carte"), # Sortie Leaflet pour la carte
+							   width = 12,
+							   textOutput("titre_carte"), # Titre dynamique de la carte
+							   sliderInput("annee", # Curseur pour sélectionner une année
+										   label = "Sélectionner une année",
+										   min = 2012, 
+										   max = 2040, 
+										   value = 2012,
+										   step = 1,
+										   sep = '')))
+				  ),
+				  column(12,
+						 box(title = "Sélectionner une variable", # Boîte pour sélectionner une variable
+							 status = "primary",
+							 solidHeader = TRUE,
+							 selectInput("variable", label = NULL, choices = c("Salaire net horaire moyen" = "SNHMHr", 
+																			   "Salaire net horaire cadre" = "SNHMHCr",
+																			   "Salaire net horaire intermédiaire" = "SNHMHPr",
+																			   "Salaire net horaire employés" = "SNHMHEr",
+																			   "Salaire net horaire ouvrier" = "SNHMHOr")),
+							 width = 12)
+				  )
+		  ),
+		  tabItem(tabName = "Présentation", # Contenu de l'onglet "Présentation"
+				  fluidRow(
+					column(12,
+						   tabsetPanel(
+							 tabPanel("Projet", # Onglet "Projet"
+									  tags$div(
+										tags$h2("Notre Projet"), # Titre
+										tags$p("Dans cette application, nous nous sommes fixés comme objectif de montrer la différence entre les femmes et les hommes au niveau du salaire. Ayant pris conscience de la différence dans la proportion de catégories professionnelles entre les femmes et les hommes, nous avons tenu à pouvoir traiter séparément chaque catégorie. Cela permet d'éviter ce biais sur la différence de salaire général, qui risque d'être influencée par cette différence de proportion dans les catégories professionnelles."), # Description du projet
+										tags$p("Pour ce projet, Léo Paul s'est dans un premier temps chargé de dénicher les bases de données complètes, comportant les salaires moyens selon plusieurs critères variés. Théo s'est ensuite chargé de modifier les bases et de réaliser les prédictions en s'appuyant sur les données de 2012 à 2021. Par la suite, Mariam a utilisé les bases créées pour réaliser une visualisation des données en 2030 sous Power BI pour réaliser le carrousel. Bastien s'est occupé du développement de l'application R Shiny."), # Description des rôles des membres de l'équipe
+										style = "font-size: 16px;" # Style CSS pour la police
+									  )
+							 ),
+							 tabPanel("Données", # Onglet "Données"
+									  tags$div(
+										tags$h2("Données"), # Titre
+										tags$p("Ce fichier de données donne des détails sur les salaires nets par heure, répartis selon le sexe, l'âge et le type de travail, à l'exclusion de l'agriculture. Les informations sont disponibles pour différentes zones géographiques, allant des petites communes à la France entière. Elles sont basées sur ce que les employeurs déclarent aux autorités et comprennent les salariés du secteur privé, des entreprises publiques, des administrations et des employeurs privés."), # Description des données
+										tags$p("Ces informations couvrent les années de 2012 à 2021. En 2016, certaines données manquaient, mais elles ont été estimées à l'aide d'un modèle polynomial pour combler les valeurs manquantes."), # Description supplémentaire des données
+										tags$a(href = "https://www.insee.fr/fr/statistiques/2021266#consulter", "lien vers les données"), # Lien vers les données source
+										style = "font-size: 16px;" # Style CSS pour la police
+									  )
+							 )
+						   )
+					)
+				  )
+		  )
+		)
+	  )
+	)</code></pre>
+			<p>Puis on défini la partie serveur, c'est ce qui gère les calculs et la logique pour l'interface utilisateur, dans celle-ci je génère la carte avec les valeurs et la légende ainsi que les valeurs minimales et maximales et les départements qui correspondent.</p>
+			<pre class="code-block"><code># Définition du serveur
+	server <- function(input, output) {
+	  # Filtrer les données en fonction de l'année sélectionnée
+	  donnees_filtrees <- reactive({
+		annee_selectionnee <- input$annee
+		donnees[[as.character(annee_selectionnee)]]
+	  })
+	  
+	  # Convertir les données géographiques en objet sf
+	  geo_data_sf <- st_as_sf(geo_data)
+	  
+	  # Titre de la carte en fonction de la variable sélectionnée
+	  output$titre_carte <- renderText({
+		variable_selectionnee <- input$variable
+		annee_selectionnee <- input$annee
+		
+		if (variable_selectionnee == "SNHMHr") {
+		  return(paste("Salaire net horaire moyen  en ", annee_selectionnee))
+		} else if (variable_selectionnee == "SNHMHCr") {
+		  return(paste("Salaire net horaire cadre en ", annee_selectionnee))
+		} else if (variable_selectionnee == "SNHMHPr") {
+		  return(paste("Salaire net horaire intermédiaire en ", annee_selectionnee))
+		} else if (variable_selectionnee == "SNHMHEr") {
+		  return(paste("Salaire net horaire employés en ", annee_selectionnee))
+		} else if (variable_selectionnee == "SNHMHOr") {
+		  return(paste("Salaire net horaire ouvrier en ", annee_selectionnee))
+		}
+	  })
+	  
+	  # Calculer et afficher la valeur maximale de la variable sélectionnée en pourcentage
+	  output$max_value <- renderText({
+		variable_selectionnee <- input$variable
+		max_value <- max(donnees_filtrees()[[variable_selectionnee]]) * 100
+		paste("Valeur :", round(max_value, 2), "%")
+	  })
+	  
+	  # Calculer et afficher la valeur minimale de la variable sélectionnée en pourcentage
+	  output$min_value <- renderText({
+		variable_selectionnee <- input$variable
+		min_value <- min(donnees_filtrees()[[variable_selectionnee]]) * 100
+		paste("Valeur :", round(min_value, 2), "%")
+	  })
+	  
+	  # Récupérer le nom du département en fonction des coordonnées géographiques
+	  output$nom_departement <- renderText({
+		data <- donnees_filtrees()
+		variable_selectionnee <- input$variable
+		position <- input$carte_marker_click
+		if (!is.null(position)) {
+		  lat <- position$lat
+		  lng <- position$lng
+		  index <- which(data$latitude == lat & data$longitude == lng)
+		  if (length(index) > 0) {
+			return(data[index, "LIBGEO"])
+		  }
+		}
+		return("")
+	  })
+	  
+	  # Trouver le nom du département correspondant à la valeur maximale de la variable sélectionnée
+	  output$max_department <- renderText({
+		data <- donnees_filtrees()
+		variable_selectionnee <- input$variable
+		max_value <- max(donnees_filtrees()[[variable_selectionnee]])
+		max_department <- data[data[[variable_selectionnee]] == max_value, "LIBGEO"]
+		return(paste("Département :", max_department))
+	  })
+	  
+	  # Trouver le nom du département correspondant à la valeur minimale de la variable sélectionnée
+	  output$min_department <- renderText({
+		data <- donnees_filtrees()
+		variable_selectionnee <- input$variable
+		min_value <- min(donnees_filtrees()[[variable_selectionnee]])
+		min_department <- data[data[[variable_selectionnee]] == min_value, "LIBGEO"]
+		return(paste("Département :", min_department))
+	  })
+	  
+	  # Créer la carte
+	  output$carte <- renderLeaflet({
+		variable_selectionnee <- input$variable
+		data <- donnees_filtrees()
+		
+		# Convertir les valeurs en pourcentage
+		popup_content <- lapply(seq_len(nrow(data)), function(i) {
+		  valeur <- round(data[i, variable_selectionnee] * 100, 2)
+		  paste0(data[i, "LIBGEO"], ":", valeur, "%")
+		})
+		
+		# Définir une palette de 4 couleurs allant du vert à l'orange
+		custom_palette <- colorNumeric(palette = "RdYlBu",
+									   domain = c(-20, 30),  # Nouveau domaine des valeurs
+									   reverse = TRUE)  # Inverser la palette
+		
+		# Créer la carte avec les données géographiques et les valeurs affichées
+		leaflet() %>%
+		  setView(lng = 1.888334, lat = 46.603354, zoom = 5) %>%  # Vue initiale centrée sur la France
+		  addTiles() %>%
+		  addPolygons(data = geo_data_sf,
+					  fillColor = ~custom_palette(data[[variable_selectionnee]] * 100),
+					  fillOpacity = 0.7,
+					  weight = 1,
+					  color = "white",
+					  label = popup_content) %>%
+		  addLegend(position = "bottomright",  # Position de la légende
+					pal = custom_palette,   # Palette de couleurs personnalisée
+					values = c(-20, 30),  # Valeurs min et max
+					title = "Salaire net horaire (%)",  # Titre de la légende
+					labFormat = labelFormat(suffix = "%"),  # Format des étiquettes
+					na.label = "NA",  # Étiquette pour les valeurs manquantes
+					opacity = 0.7)  # Opacité de la légende
+	  })</code></pre>
+			<p>Enfin, on lance l'application avec cette ligne, en mettant les bons noms pour l'interface utilisateur et le serveur.</p>
+			<pre class="code-block"><code># Lancer l'application Shiny
+	shinyApp(ui = ui, server = server)</code></pre>
+			<p>Voici le résultat final pour la carte et les sélecteurs :</p>
+			<img src="document/carte.webp">
+			<p>En déplaçant la souris sur la carte on à la valeur pour le département qui s'affiche, on peut modifier l'année des données ainsi que la variable qu'on souhaite afficher</p>
+		</section>
+	</section>
+	<p><a href="document/composante.pdf" target="_blank">lien vers la fiche bilan SAE</a>
+</body>
+</html>

@@ -1,0 +1,123 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1D1D1D;
+    color: #2272FF;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #2272FF;
+    text-align: center;
+    padding: 20px;
+}
+
+h1, h2, h3, h4 {
+    font-weight: bold;
+    color: #2272FF;
+}
+
+nav {
+    text-align: center;
+    background-color: #2272FF;
+}
+
+nav ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+nav li {
+    display: inline;
+    margin: 10px;
+}
+
+nav a {
+    color: #000000; /* Modification de la couleur du texte du menu en noir */
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.nav-toggle {
+    display: none;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 600px) {
+    nav ul {
+        display: none;
+        position: absolute;
+        top: 50px;
+        left: 0;
+        width: 100%;
+        background-color: #2272FF;
+        text-align: center;
+    }
+
+    nav ul.show {
+        display: block;
+    }
+
+    nav li {
+        display: block;
+        margin: 0;
+    }
+
+    .nav-toggle {
+        display: block;
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        cursor: pointer;
+    }
+}
+
+section {
+    margin: 20px;
+    padding: 20px;
+    border: 2px solid #2272FF;
+    background-color: #1D1D1D;
+}
+
+a {
+    color: #2272FF;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 5px;
+}
+
+@media screen and (min-width: 600px) {
+    header {
+        padding: 30px;
+    }
+
+    section {
+        margin: 30px;
+    }
+}
+
+@media screen and (min-width: 1024px) {
+    header {
+        padding: 40px;
+    }
+
+    section {
+        margin: 40px;
+    }
+}
+
+/* Texte noir pour le bandeau tout en haut */
+header h1 {
+    color: #000000;
+}
