@@ -1,222 +1,203 @@
 <!DOCTYPE html>
+<html lang="fr">
 <head>
-    <title>Mon E-Portfolio</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bastien Ebely — E-Portfolio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f8f9fa;
+            margin: 0;
+            color: #23272f;
+        }
+        header {
+            background: #212a33;
+            color: #fff;
+            padding: 32px 0 16px 0;
+            text-align: center;
+            box-shadow: 0 2px 4px #0001;
+        }
+        nav {
+            background: #fff;
+            box-shadow: 0 2px 4px #0001;
+            padding: 0.5em 0;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 0;
+            padding: 0;
+        }
+        nav li {
+            margin: 0 1em;
+        }
+        nav a {
+            text-decoration: none;
+            color: #23272f;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        nav a:hover {
+            color: #3b7ddd;
+        }
+        section {
+            max-width: 900px;
+            margin: 40px auto 0 auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px #0001;
+            padding: 32px 24px;
+        }
+        h1, h2, h3 {
+            font-weight: 700;
+        }
+        h1 { font-size: 2.4rem; letter-spacing: -1px;}
+        h2 { font-size: 1.6rem; margin-top: 0;}
+        h3 { font-size: 1.2rem; color: #3b7ddd;}
+        .btn {
+            background: #3b7ddd;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s;
+            display: inline-block;
+            margin: 6px 0;
+        }
+        .btn:hover {
+            background: #235099;
+        }
+        .card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 800px) {
+            .card-grid { grid-template-columns: 1fr; }
+            section { padding: 20px 5vw; }
+        }
+        .project-card {
+            background: #f4f6f8;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px #0001;
+            padding: 18px 22px;
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .project-card h4 { margin-top: 0; margin-bottom: 0.5em;}
+        .project-card ul { margin: 0 0 0.5em 1em;}
+        .project-card .btn {
+            align-self: flex-start;
+        }
+        .info-list {
+            list-style: none;
+            padding: 0;
+        }
+        .info-list li {
+            margin-bottom: 4px;
+        }
+        .contact-list {
+            list-style: none;
+            padding: 0;
+        }
+        .contact-list li {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
 
     <header>
-        <h1>Bienvenue sur mon E-Portfolio</h1>
+        <h1>Bastien Ebely</h1>
+        <p>Étudiant en science des données — IUT de Paris, Rives de Seine</p>
+        <a href="CV.pdf" class="btn" target="_blank">Télécharger mon CV</a>
     </header>
 
     <nav>
-        <div class="nav-toggle">&#9776;</div>
         <ul>
             <li><a href="#presentation">Présentation</a></li>
-            <li><a href="#diplomes">Mes Diplômes</a></li>
-            <li><a href="#competences">Mes Compétences</a></li>
-            <li><a href="#projets">Mes Projets</a></li>
-            <li><a href="#cv">Mon CV</a></li>
-            <li><a href="#reseaux">Mes Réseaux</a></li>
+            <li><a href="#competences">Compétences</a></li>
+            <li><a href="#projets">Projets</a></li>
+            <li><a href="#contact">Contact</a></li>
         </ul>
     </nav>
 
-	<section id="presentation">
-		<h2>Présentation</h2>
-		<p>Je m’appelle Bastien EBELY, étudiant à l’IUT de Paris – Rives de Seine en BUT Science des données filière VCOD, actuellement en 3e année. Je sais utiliser divers langages de programmation telle que Python et R par exemple ainsi que plusieurs logiciels comme Excel, que j'utilise au quotidien, ou encore Tableau et Power BI.</p>
-		<p>Actuellement, je suis à la recherche d'un stage de 5 mois disponible dès maintenant.</p>
-	</section>
-
-    <section id="diplomes">
-        <h2>Mes Diplômes</h2>
-        <h3>Mon Parcours Scolaire</h3>
-        <p>J’ai passé mon bac au campus scolaire de Coulommiers en filière STI2D. Je suis en 3e année du BUT Science des données à l’IUT de Paris – Rives de Seine. Au cours des 3 ans de formation, on apprend divers langages de programmation comme : Python, R, SAS, html, css et SQL entre autres. Ainsi que l’utilisation de différents logiciels comme : Access, Tableau et Power BI par exemple.</p>
+    <section id="presentation">
+        <h2>Présentation</h2>
+        <p>Je m’appelle Bastien EBELY, étudiant à l’IUT de Paris – Rives de Seine (BUT Science des données, 3e année). Passionné par la data, la programmation et la visualisation, j’ai travaillé sur divers projets utilisant Python, R, le web scraping, la statistique et la dataviz. Je recherche actuellement un <strong>stage de 5 mois</strong> ou une alternance en data science ou développement analytique.</p>
     </section>
 
-	<section id="competences">
-		<h2>Mes Compétences</h2>
-		<p>Voici une liste non-exhaustive de mes compétences, réparties dans différentes catégories :</p>
-		
-		<h4>Compétences téchniques</h4>
-		<ul>
-			<li>Analyse statistique</li>
-			<li>Gestion de données</li>
-			<li>Analyse de données</li>
-			<li>Algèbre linéaire</li>
-			<li>Statistique descriptive et univariée</li>
-			<li>Classification</li>
-		</ul>
-				
-		<h4>Langues</h4>
-		<ul>
-			<li>Français (Langue maternelle)</li>
-			<li>Anglais (Niveau : B1)</li>
-		</ul>
-		
-		<h4>Langages de Programmation</h4>
-		<ul>
-			<li>R</li>
-			<li>Python</li>
-			<li>SAS</li>
-			<li>HTML</li>
-			<li>CSS</li>
-			<li>SQL</li>
-		</ul>
-
-		<h4>Logiciels</h4>
-		<ul>
-			<li>Excel</li>
-			<li>Access</li>
-			<li>Tableau</li>
-			<li>Power BI</li>
-		</ul>
-
-		<h4>Soft Skills</h4>
-		<ul>
-			<li>Travail en autonomie</li>
-			<li>Travail en groupe</li>
-			<li>Organisation du travail</li>
-		</ul>
-	</section>
-
-	<section id="projets">
-		<h2>Mes Projets Réalisés</h2>
-
-		<section id="projet1">
-			<h3>Projet n°1</h3>
-			<h4>Enquête d’évaluation du bilan carbone des membres de l’IUT de Paris – Rives de Seine :</h4>
-			<p>Contexte :</p>
-			<p>C'est un Projet de groupe dans lequel on devait étudier les habitudes des membres de l'IUT (professeurs, étudiants, personnels, etc.) pour analyser le bilan carbone de chacun pour estimer le bilan total de l'IUT et proposer de possibles solutions.</p>
-			<p>Étapes du projet :</p>
-			<ul>
-				<li>Création d'un questionnaire.</li>
-				<li>Envoyer le questionnaire aux membres de l’IUT.</li>
-				<li>Traiter les données récoltées pour les analyser.</li>
-				<li>Présenter les analyses avec un support visuel.</li>
-			</ul>
-		</section>
-
-		<section id="projet2">
-			<h3>Projet n°2</h3>
-			<h4>Projet web scraping</h4>
-			<p>Contexte :<p>
-			<p>Ce projet de web scraping vise à collecter des données sur le site web d'Action. L'objectif est d'extraire des informations sur les produits disponibles afin de les analyser ou de les utiliser à d'autres fins.</p>
-			<p>Étapes du projet :</p>
-			<ul>
-				<li>Exploration du site pour comprendre l'architecture et les requêtes API.</li>
-				<li>Récupération du jeton d'authentification pour requêter l'API.</li>
-				<li>Collecte des informations des produits.</li>
-				<li>Création d'un fichier JSON pour chaque produit.</li>
-				<li>Conversion des fichiers JSON en DataFrame pour faire des analyses.</p>
-			</ul>
-			<p>Pour plus de détails, veuillez <a href="webscraping.html" target="_blank">cliquer ici</a>.</p>
-			</section>
-
-		<section id="projet3">
-			<h3>Projet n°3</h3>
-			<h4>Projet sur les inégalités homme/femme</h4>
-			<p>Contexte :</p>
-			<p>C'est un projet de groupe pour lequel nous avions pour mission de trouver des données à traiter, analyser, présenter et publier sous forme de carrousel Instagram.<br>Les données devaient être pertinentes donc nous devions faire attention à leur véracité, elles devaient être suffisamment récentes et nous devions en avoir assez pour pouvoir en tirer quelque chose.</p>
-			<p>Étapes du projet :</p>
-			<ul>
-				<li>Recherche de bases de données pertinentes.</li>
-				<li>Analyse des données sur Excel.</li>
-				<li>Nettoyage et préparation des données sur R.</li>
-				<li>Analyses des données sur R.</li>
-				<li>Développement d'une application R Shiny avec une carte interactive.</li>
-				<li>Présentation orale de l'application R Shiny.</li>
-				<li>Création d'un carrousel Instagram pour présenter les résultats.</li>
-			</ul>
-			<p>Pour plus de détails, veuillez <a href="inegalite.html" target="_blank">cliquer ici</a>.</p>
-		</section>
-		
-		<section id="projet4">
-			<h3>Projet n°4</h3>
-			<h4>Projet de programmation statistique sur R</h4>
-			<p>Contexte :</p>
-			<p>Pour ce projet, il fallait appliquer les connaissances acquises en cours en faisant des résumés statistique, des graphiques d'analyse descriptive à partir d'une base de données unique à chacun le tout en respectant un cahier des charges.</p>
-			<p>Étapes du projet :</p>
-			<ul>
-				<li>Appropriation de la base de données.</li>
-				<li>Analyses statistique sur R.</li>
-				<li>Rendu du code au format RMarkdown et html.</li>
-				<li>Présentation orale du code et des analyses.</li>
-			</ul>
-			<p>Pour plus de détails, veuillez <a href="statR.html" target="_blank">cliquer ici</a>.</p>
-		</section>
-		
-		<section id="projet5">
-			<h3>Projet n°5</h3>
-			<h4>Projet de Description et Prévision de séries temporelles </h4>
-			<p>Contexte :</p>
-			<p>Pour ce projet nous nous intéressons aux données de l'’Energy Information Administration (EIA) des États-Unis sur la production d’électricité entre 2001 et 2022.<br>Les données sont mensuelles et ventilées par type de production, l'unité est le millier de mégawatts/heures.<br><a href="fiche_mission.pdf" target="_blank">Pour cela nous avions une fiche mission</a></p>
-			<p>Étapes du projet :</p>
-			<ul>
-				<li>Récupérer la série chronologique attribuée.</li>
-				<li>Faire les descriptions et prévisions demandées.</li>
-				<li>Rendre un rapport synthétique d'environ 10 pages avec un résumé en anglais.</li>
-			</ul>
-		</section>		
-		
-		<section id="projet6">
-			<h3>Projet n°6</h3>
-			<h4>Projet de classification automatique</h4>
-			<p>Contexte :</p>
-			<p>Ce projet consistait à appliquer les methodes de classification vues en cours pour les automatisées sur R.</p>
-			<p>Étapes du projet :</p>
-			<ul>
-				<li>Récupération des données.</li>
-				<li>Nettoyage des données.</li>
-				<li>Analyse descriptive.</li>
-				<li>Classification ascendante hiérarchique et clustering.</li>
-				<li>Rendu d'un rapport d'une dizaine de page.</li>
-			</ul>
-		</section>
-
-		<section id="projet7">
-			<h3>Projet n°7</h3>
-			<h4>Projet de création d'application comparative</h4>
-			<p>Contexte :</p>
-			<p>Pour ce projet en groupe de 2, nous devions faire une application web permettant de comparer 2 villes sur différents aspects tel que : la population, la superficie, la météo actuelle (prédiction sur 7 jours) ainsi que le climat de la région, les offres d'emploi et de logement.</p>
-			<p>Étapes du projet :</p>
-			<ul>
-				<li>Recherche des aspects à comparer.</li>
-				<li>Recherche des API et des données qui seront utilisées.</li>
-				<li>Programmation de l'application en utilisant les API et données.</li>
-				<li>Mise en ligne de l'application.</li>
-				<li>Démonstration de l'application et rapport explicatif.</li>
-			</ul>
-		</section>
-
-	</section>
-
-
-    <section id="cv">
-        <h2>Mon CV</h2>
-        <p>Vous pouvez télécharger mon CV en <a href="CV.pdf" target="_blank">cliquant ici</a>.</p>
+    <section id="competences">
+        <h2>Compétences</h2>
+        <ul class="info-list">
+            <li><b>Langages</b> : Python, R, SQL, SAS, HTML, CSS, JavaScript</li>
+            <li><b>Logiciels</b> : Excel, Access, Power BI, Tableau</li>
+            <li><b>Outils</b> : Git, R Shiny, Pandas</li>
+            <li><b>Méthodes</b> : Web scraping, analyses statistiques, reporting, data viz, machine learning débutant</li>
+            <li><b>Soft skills</b> : Autonomie, travail en équipe, organisation, présentation orale</li>
+            <li><b>Langues</b> : Français (natif), Anglais (B1)</li>
+        </ul>
     </section>
 
-	<section id="reseaux">
-		<h2>Me contacter</h2>
-		<ul>
-			<li><a href="https://www.linkedin.com/in/bastien-ebely-850384273" target="_blank">LinkedIn</a></li>
-			<li>Email : <a href="mailto:ebely.bastien@gmail.com">ebely.bastien@gmail.com</a></li>
-			<li>Téléphone : +33 (0)7 69 12 08 94</li>
-		</ul>
-	</section>
+    <section id="projets">
+        <h2>Projets réalisés</h2>
+        <div class="card-grid">
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const navToggle = document.querySelector('.nav-toggle');
-            const navMenu = document.querySelector('nav ul');
+            <div class="project-card">
+                <h4>Web scraping du site Action</h4>
+                <p>Extraction automatisée des produits et analyse de données via Python, API, Pandas, JSON. Organisation propre des résultats pour l’analyse ou la data viz.</p>
+                <a href="webscraping.html" class="btn" target="_blank">Voir le projet</a>
+            </div>
 
-            navToggle.addEventListener('click', function() {
-                navMenu.classList.toggle('show');
-            });
-        });
-    </script>
+            <div class="project-card">
+                <h4>Application R Shiny sur les inégalités H/F</h4>
+                <p>Recherche, nettoyage, analyse de données sur les écarts de salaires, puis création d’une app R Shiny avec carte interactive et carrousel Instagram de restitution.</p>
+                <a href="inegalite.html" class="btn" target="_blank">Voir le projet</a>
+            </div>
+
+            <div class="project-card">
+                <h4>Programmation statistique sur R</h4>
+                <p>Analyses statistiques et graphiques automatisés à partir d’une base unique, rendu HTML via RMarkdown.</p>
+                <a href="statR.html" class="btn" target="_blank">Voir le projet</a>
+            </div>
+
+            <div class="project-card">
+                <h4>Description & prévision de séries temporelles</h4>
+                <p>Analyse et prévisions sur la production d’électricité américaine (2001-2022), data viz, rapport synthétique et résumé anglais.</p>
+                <a href="fiche_mission.pdf" class="btn" target="_blank">Fiche mission (PDF)</a>
+            </div>
+
+            <div class="project-card">
+                <h4>Classification automatique (R)</h4>
+                <p>Mise en œuvre de méthodes de classification ascendante hiérarchique et clustering automatique, analyse descriptive, rapport complet.</p>
+                <!-- Si tu veux, tu peux ajouter un lien vers le PDF ou HTML -->
+            </div>
+
+            <div class="project-card">
+                <h4>Application comparative de villes</h4>
+                <p>Développement d’une app web pour comparer deux villes françaises sur population, météo, emploi, logement. Utilisation d’APIs et intégration web.</p>
+                <!-- Ajoute un lien si tu mets le projet en ligne -->
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>Contact</h2>
+        <ul class="contact-list">
+            <li><b>Email</b> : <a href="mailto:ebely.bastien@gmail.com">ebely.bastien@gmail.com</a></li>
+            <li><b>Téléphone</b> : +33 7 69 12 08 94</li>
+            <li><b>LinkedIn</b> : <a href="https://www.linkedin.com/in/bastien-ebely-850384273" target="_blank">Profil LinkedIn</a></li>
+            <li><b>GitHub</b> : <a href="https://github.com/shadow75016" target="_blank">shadow75016</a></li>
+        </ul>
+    </section>
 
 </body>
 </html>
